@@ -1,0 +1,88 @@
+<!-- 
+author :Warren
+http://www.wglong.com
+ -->
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Warren-JQM+phonegap实战Demo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="./css/frame/jquery.mobile-1.3.0.min.css">
+<!-- <link rel="stylesheet" href="./css/frame/ios_inspired/styles.css"
+	rel="stylesheet" /> -->
+<link rel="stylesheet" href="./css/global.css">
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/iscroll.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/myInit.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/jquery.mobile-1.3.0.min.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/cordova-2.6.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/global.js"></script>
+</head>
+
+<body>
+
+	<div data-role="page" id="menuPage" data-dom-cache="true"
+		data-theme="d">
+		<script type="text/javascript" charset="utf-8" src="./js/cache.js"></script>
+		<script type="text/javascript">
+			$("#menuPage").live("pagebeforeshow", function() {
+				isCache = getCache("isCache");
+				if (isCache == null || isCache) {
+					$("#flip2").val("true");
+				} else {
+					$("#flip2").val("false");
+				}
+				$("#flip2").slider("refresh");
+				$("#flip2").on("slidestop", function(event, ui) {
+					if ($("#flip2").val() == "true") {
+						setCacheState("true");
+					} else {
+						setCacheState("");
+					}
+
+				});
+			});
+		</script>
+
+		<div data-role="header" data-theme="a">
+			<a href="#" data-rel="back" data-role="button" data-inline="true"
+				data-icon="back">返回</a>
+			<h1>设置</h1>
+		</div>
+		<div data-role="content" data-theme="d" data-divider-theme="a">
+			<ul data-role="listview" data-inset="true">
+				<li data-role="list-divider">系统设置</li>
+				<li data-role="fieldcontain"><label for="flip2">是否开启离线浏览:</label>
+					<select name="flip2" id="flip2" data-role="slider" data-theme="c">
+						<option value="false">否</option>
+						<option value="true">是</option>
+				</select></li>
+				<li data-role="fieldcontain">
+					<button type="button" data-theme="c" onclick="isDeleteCatcheFile()">清除缓存</button>
+				</li>
+				<li data-role="fieldcontain">
+					<button type="button" data-theme="e" onclick="isExit()">退出软件</button>
+				</li>
+			</ul>
+			<div data-role="collapsible" data-collapsed="false" data-inset="true" data-theme="c"
+				data-content-theme="d">
+				<h4>关于软件</h4>
+				<p>作者：Warren</p>
+				<p>版本：1.1</p>
+				<p>更多内容请访问：</p>
+				<p>
+					<a href="http://www.wglong.com" data-ajax="false" rel="external"
+						target="_blank">http://www.wglong.com</a>
+				</p>
+
+			</div>
+
+		</div>
+</body>
+
+</html>

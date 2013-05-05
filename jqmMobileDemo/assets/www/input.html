@@ -1,0 +1,166 @@
+<!-- 
+author :Warren
+http://www.wglong.com
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+<title>Warren-JQM+phonegap实战Demo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+	content="user-scalable=no, width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="./css/frame/jquery.mobile-1.3.0.min.css">
+<!-- <link rel="stylesheet" href="./css/frame/ios_inspired/styles.css"
+	rel="stylesheet" /> -->
+<link rel="stylesheet" href="./css/global.css">
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/iscroll.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/myInit.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/jquery.mobile-1.3.0.min.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="./js/frame/cordova-2.6.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/global.js"></script>
+
+</head>
+<body>
+	<div data-role="page" id="inputPage" data-theme="d">
+		<script type="text/javascript" charset="utf-8">
+			document.addEventListener("deviceready", onDeviceReady, false);
+			var pictureSource; //  getPicture:数据来源参数的一个常量  
+			var destinationType; // getPicture中：设置getPicture的结果类型  
+			function onDeviceReady() {
+				pictureSource = navigator.camera.PictureSourceType;
+				destinationType = navigator.camera.DestinationType;
+			}
+
+			var pickUrl;
+			function fromCamera(source) {
+				navigator.camera.getPicture(function(imageURI) {
+					var largeImage = document.getElementById('smallImage');
+					largeImage.style.display = 'block';
+					largeImage.src = imageURI;
+					pickUrl = imageURI;
+				}, function() {
+					console.log('加载相册出错!');
+				}, {
+					quality : 50,
+					destinationType : destinationType.FILE_URI,
+					sourceType : source
+				});
+			}
+
+			/*********上传图片***************/
+			function uploadFile() {
+				try{
+					checkConnection();
+				}catch(e){
+						if(isInit!=0){
+							 alert(e.name + ": " + e.message);
+						}
+					
+					}
+				showLoading();
+				$("#submitButton").button("disable");
+				$("#submitButton").button("refresh");
+				var imageURI = pickUrl;
+				if (!imageURI){
+					saveText();//没有上传图片，则利用ajax方式保存数据
+					return;
+				}
+				
+				var options = new FileUploadOptions();
+				options.fileKey = "file";
+				options.fileName = imageURI
+						.substr(imageURI.lastIndexOf('/') + 1);
+				options.mimeType = "image/jpeg";
+				var params = new Object();
+				params.jqmMobileDemoInputName = $("#name").val();
+				params.jqmMobileDemoInputContent = $("#content").val();
+				options.params = params;
+				var ft = new FileTransfer();
+				ft.upload(imageURI, encodeURI(serverURL
+						+ '/ajax!jqmMobileDemoInput'), function() {
+					hideLoading();
+					$("#submitButton").button("enable");
+					$("#submitButton").button("refresh");
+					//myAlert('上传成功!');
+					$.mobile.changePage("dialog.html", {
+						role : "dialog",
+						transition : "slidedown"
+					});
+				}, function() {
+					hideLoading();
+					$("#submitButton").button("enable");
+					$("#submitButton").button("refresh");
+					myAlert('上传失败!');
+				}, options);
+			}
+			
+			function saveText() {
+				showLoading();
+				var name = $("#name").val();
+				var content = $("#content").val();
+				var params = {
+						jqmMobileDemoInputName :encodeURIComponent(name),
+						jqmMobileDemoInputContent : encodeURIComponent(content)
+				};
+				$.ajax({
+					async : false,
+					url : serverURL + '/ajax!jqmMobileDemoInput', // 跨域URL
+					type : 'get',
+					dataType : 'jsonp',
+					jsonp : 'jsoncallback', //默认callback
+					data : params,
+					timeout : 5000,
+					beforeSend : function() { //jsonp 方式此方法不被触发。原因可能是dataType如果指定为jsonp的话，就已经不是ajax事件了
+					},
+					success : function(json) { //客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数 
+						hideLoading();
+						var jsonObject = eval("(" + json + ")");
+						if("ok"==jsonObject.str){
+							$.mobile.changePage("dialog.html", {
+								role : "dialog",
+								transition : "slidedown"
+							});
+						}else{
+							myAlert("发布失败");
+						}
+						
+					},
+					complete : function(XMLHttpRequest, textStatus) {
+					},
+					error : function(xhr) {
+						hideLoading();
+						//jsonp 方式此方法不被触发
+						//请求出错处理 
+						myAlert("请求出错(请检查相关度网络状况.)");
+					}
+				});
+
+			}
+			
+		</script>
+		<div data-role="header" data-theme="a">
+			<a href="#" data-rel="back" data-role="button" data-inline="true"
+				data-icon="back">返回</a>
+			<h1>发布</h1>
+		</div>
+		<div data-role="content" data-theme="d">
+			<input type="text" name="name" id="name" placeholder="昵称" value="游客" />
+			<textarea name="textarea" name="content" id="content"
+				placeholder="内容">测试信息</textarea>
+			<a href="javascript:fromCamera(pictureSource.PHOTOLIBRARY)"
+				data-role="button">上传图片</a>
+			<p>注意：图片大小请勿超过2M,否则会上传失败。</p>
+			<div class="upload-img">
+				<img id="smallImage" src="" />
+			</div>
+			<button onclick="uploadFile()" id="submitButton"  data-theme="a">提交</button>
+		</div>
+
+	</div>
+</body>
+</html>
