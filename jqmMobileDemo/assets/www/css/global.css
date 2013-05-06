@@ -5,7 +5,8 @@ body {
 	font-size: 14px;
 	-webkit-user-select: none;
 	-webkit-text-size-adjust: none;
-	font-family: helvetica;
+	font-family: helvetica;	
+	 -webkit-backface-visibility: hidden;/* for иафа */
 }
 
 .weightFont {
