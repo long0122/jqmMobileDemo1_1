@@ -1,4 +1,4 @@
-JQM+Phonegap项目实战Demo1.1
+JQM+Phonegap项目实战Demo1.1版本
 ================
 
 1.1版本新增功能：
